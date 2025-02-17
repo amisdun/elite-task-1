@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { ItemService } from "../services/items.services";
-
-const ItemServiceInstance = new ItemService();
+import { validationResult } from "express-validator";
 
 export class ItemController {
-  async addItem(req: Request, res: Response) {
+  static async addItem(req: Request, res: Response) {
     try {
+      const ItemServiceInstance = new ItemService();
       const { quantity, expiry } = req.body;
       const { item } = req.params;
       const response = await ItemServiceInstance.addItemService({
@@ -19,8 +19,9 @@ export class ItemController {
     }
   }
 
-  async sellItem(req: Request, res: Response) {
+  static async sellItem(req: Request, res: Response) {
     try {
+      const ItemServiceInstance = new ItemService();
       const { quantity } = req.body;
       const { item } = req.params;
       const response = await ItemServiceInstance.sellItemService({
@@ -33,8 +34,9 @@ export class ItemController {
     }
   }
 
-  async getItem(req: Request, res: Response) {
+  static async getItem(req: Request, res: Response) {
     try {
+      const ItemServiceInstance = new ItemService();
       const { item } = req.params;
       const response = await ItemServiceInstance.getItemService(item);
       return res.status(201).json(response);

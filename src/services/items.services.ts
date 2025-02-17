@@ -17,6 +17,11 @@ export class ItemService {
     expiry: number;
   }) {
     try {
+      if (Date.now() >= expiry)
+        throw new Error(
+          "quantity has already expired, please specify a valid expiry",
+        );
+
       let itemData: Item = await this.itemRepository.findOne({
         where: { name: item.toLowerCase() },
       });
