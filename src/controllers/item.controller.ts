@@ -39,7 +39,7 @@ export class ItemController {
       const ItemServiceInstance = new ItemService(AppDataSource);
       const { item } = req.params;
       const response = await ItemServiceInstance.getItemService(item);
-      return res.status(201).json(response);
+      return res.status(200).json(response);
     } catch (error) {
       return res.status(400).json({ errors: error.message });
     }

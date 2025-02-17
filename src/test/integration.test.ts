@@ -16,11 +16,16 @@ describe("Items And Quanity Test", () => {
     server.close();
   });
 
+  const time_1 = Date.now() + 10_000;
+  const time_2 = Date.now() + 10_000;
+  const time_3 = Date.now() + 10_000;
+  const time_4 = Date.now() + 10_000;
+  const time_5 = Date.now() + 10_000;
+
   describe("Test Add Item", () => {
     it("should return error if some fields are missing", async () => {
       const url = "/foo/add";
       const response = await request.post(url).send({});
-      console.log(response.body);
 
       expect(response.body.errors).toBeDefined();
       expect(response.status).toEqual(422);
@@ -33,11 +38,10 @@ describe("Items And Quanity Test", () => {
     it("should return {} and 201 if a new item is created", async () => {
       const body = {
         quantity: 10,
-        expiry: Date.now() + 1000,
+        expiry: time_1,
       };
       const url = "/foo/add";
       const response = await request.post(url).send(body);
-      console.log(response.body);
 
       expect(response.body).toMatchObject({});
       expect(response.status).toEqual(201);
@@ -59,7 +63,7 @@ describe("Items And Quanity Test", () => {
   });
 
   describe("Test Sell Item", () => {
-    it("should return 422 with missing fields", async () => {
+    it("should return status code 422 when there are missing fields", async () => {
       const body = {};
       const url = "/foo/sell";
       const response = await request.post(url).send(body);
@@ -80,7 +84,7 @@ describe("Items And Quanity Test", () => {
       await new ItemService(AppDataSource).addItemService({
         item: "foo",
         quantity: 10,
-        expiry: Date.now() + 20_000,
+        expiry: time_2,
       });
 
       const response = await request.post(url).send(body);
@@ -98,7 +102,7 @@ describe("Items And Quanity Test", () => {
       await new ItemService(AppDataSource).addItemService({
         item: "foo",
         quantity: 10,
-        expiry: Date.now() + 20_000,
+        expiry: time_3,
       });
 
       const response = await request.post(url).send(body);
@@ -111,22 +115,41 @@ describe("Items And Quanity Test", () => {
 
   describe("Get Available Items", () => {
     it("should return total number of quantity available ", async () => {
-      const body = {
-        quantity: 50,
-      };
-      const url = "/foo/sell";
+      const url = "/foo/quantity";
 
-      await new ItemService(AppDataSource).addItemService({
+      const times = [time_4, Date.now() + time_5];
+
+      times.forEach(async (time) => {
+        await new ItemService(AppDataSource).addItemService({
+          item: "foo",
+          quantity: 10,
+          expiry: time,
+        });
+      });
+      const response_1 = await request.get(url).send();
+
+      expect(response_1.body.quantity).toBeDefined();
+      expect(response_1.body.validTill).toBeDefined();
+      expect(response_1.body).toMatchObject({
+        quantity: 45,
+        validTill: time_1,
+      });
+      expect(response_1.status).toEqual(200);
+
+      await new ItemService(AppDataSource).sellItemService({
         item: "foo",
-        quantity: 10,
-        expiry: Date.now() + 20_000,
+        quantity: 20,
       });
 
-      const response = await request.post(url).send(body);
+      const response_2 = await request.get(url).send();
 
-      expect(response.body.errors).toBeDefined();
-      expect(response.status).toEqual(400);
-      expect(response.body.errors).toBe("Items has expired or low in quantity");
+      expect(response_2.body.quantity).toBeDefined();
+      expect(response_2.body.validTill).toBeDefined();
+      expect(response_2.body).toMatchObject({
+        quantity: 25,
+        validTill: time_3,
+      });
+      expect(response_2.status).toEqual(200);
     });
   });
 });
