@@ -1,0 +1,35 @@
+{
+   "name": "elite-auto",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "type": "commonjs",
+   "devDependencies": {
+      "@types/node": "^22.13.4",
+      "nodemon": "^3.1.9",
+      "prettier": "^3.5.1",
+      "ts-node": "10.9.1",
+      "typescript": "^5.7.3"
+   },
+   "dependencies": {
+      "@": "types/express",
+      "@types/node-cron": "^3.0.11",
+      "concurrently": "^9.1.2",
+      "dotenv": "^16.4.7",
+      "express": "^4.21.2",
+      "express-validator": "^7.2.1",
+      "node-cron": "^3.0.3",
+      "pg": "^8.4.0",
+      "reflect-metadata": "^0.1.13",
+      "typeorm": "0.3.20"
+   },
+   "scripts": {
+      "watch": "tsc -w",
+      "dev": "npm run watch && nodemon build/index.js",
+      "start:dev": "concurrently \"tsc -w\" \"nodemon build/index.js\"",
+      "build": "tsc",
+      "start": "ts-node src/index.ts -w",
+      "typeorm": "typeorm-ts-node-commonjs",
+      "migration": " npm run typeorm migration:run -- -d ./src/data-source.ts",
+      "format": "prettier --write \"src/**/*.ts\""
+   }
+}
