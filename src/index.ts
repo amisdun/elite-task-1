@@ -1,4 +1,5 @@
 import { AppDataSource } from "./data-source";
+import bodyParser from "body-parser";
 import express from "express";
 import * as dotenv from "dotenv";
 import { Request, Response } from "express";
@@ -12,14 +13,11 @@ import { ItemService } from "./services/items.services";
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-const { PORT = 3000 } = process.env;
-app.use("", itemsRouter);
-app.get("*", (req: Request, res: Response) => {
-  res.status(505).json({ message: "Bad Request" });
-});
 
 const numCPUs = os.cpus().length;
+
+if (process.env.NODE_ENV !== "test") {
+}
 
 if (cluster.isPrimary) {
   console.log(`Master process ${process.pid} is running`);
@@ -33,6 +31,14 @@ if (cluster.isPrimary) {
     cluster.fork();
   });
 } else {
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  const { PORT = 3000 } = process.env;
+  app.use("", itemsRouter);
+  app.get("*", (req: Request, res: Response) => {
+    res.status(505).json({ message: "Bad Request" });
+  });
+
   AppDataSource.initialize()
     .then(async () => {
       app.listen(PORT, () => {
@@ -44,8 +50,10 @@ if (cluster.isPrimary) {
       console.log("Data Source has been initialized!");
       cron.schedule(
         "0 */2 * * * ",
-        new ItemService().periodicallyClearExpiredRecords,
+        new ItemService(AppDataSource).periodicallyClearExpiredRecords,
       );
     })
     .catch((error) => console.log(error));
 }
+
+export { app };

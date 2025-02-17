@@ -1,11 +1,17 @@
-import { EntityManager, Raw } from "typeorm";
-import { AppDataSource } from "../data-source";
+import { DataSource, EntityManager, Raw, Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Quantity } from "../entity/Quantity";
 
 export class ItemService {
-  private quantityRepository = AppDataSource.getRepository(Quantity);
-  private itemRepository = AppDataSource.getRepository(Item);
+  private quantityRepository: Repository<Quantity>;
+  private itemRepository: Repository<Item>;
+  private dataSource: DataSource;
+
+  constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
+    this.quantityRepository = dataSource.getRepository(Quantity);
+    this.itemRepository = dataSource.getRepository(Item);
+  }
 
   async addItemService({
     item,
@@ -53,7 +59,7 @@ export class ItemService {
   }) {
     try {
       const dateNow = Date.now();
-      return await AppDataSource.transaction(
+      return await this.dataSource.transaction(
         async (entityManager: EntityManager) => {
           const itemData = await entityManager.findOne(Item, {
             where: { name: item.toLowerCase() },
@@ -72,7 +78,7 @@ export class ItemService {
             .orderBy("id", "ASC")
             .getOne();
 
-          if (!data) throw Error("Item has expired or low in quantity");
+          if (!data) throw Error("Items has expired or low in quantity");
 
           data.quantity -= quantity;
           await entityManager.save(data);
@@ -101,7 +107,8 @@ export class ItemService {
       if (!totalQuantity)
         return { quantity: totalQuantity || 0, validTill: null };
 
-      const validTill = await AppDataSource.getRepository(Quantity)
+      const validTill = await this.dataSource
+        .getRepository(Quantity)
         .createQueryBuilder()
         .where({ item: itemData, expiry: Raw((x) => `${x} > ${dateNow}`) })
         .orderBy("id", "ASC")
@@ -119,9 +126,13 @@ export class ItemService {
   async periodicallyClearExpiredRecords() {
     try {
       const dateNow = Date.now();
-      await this.quantityRepository.delete({
+      const records = await this.quantityRepository.delete({
         expiry: Raw((x) => `${x} > ${dateNow}`),
       });
+
+      console.log(
+        `${records.affected} expired items has been deleted from the database`,
+      );
     } catch (error) {
       throw error;
     }

@@ -4,14 +4,15 @@
          "es5",
          "es6"
       ],
-      "target": "es5",
+      "target": "ES2022",
       "module": "commonjs",
       "moduleResolution": "node",
       "outDir": "./build",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "types": ["@types/emscripten", "@types/web", "@types/jest"]
    },
-   "exclude": ["src/test/**","jest.config.ts"]
+   "exclude": ["jest.config.ts"]
 }
