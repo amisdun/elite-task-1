@@ -89,7 +89,7 @@ export class ItemService {
               .orderBy("id", "ASC")
               .getOne();
             
-            if(!data) throw new Error('cannot complete this request, items are low in quantity')
+            if(!data) throw new Error('cannot complete this request, items are low in quantity or has expired')
 
             const temp = data.quantity;
 
