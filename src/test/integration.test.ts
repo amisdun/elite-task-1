@@ -17,10 +17,10 @@ describe("Items And Quanity Test", () => {
   });
 
   const time_1 = Date.now() + 10_000;
-  const time_2 = Date.now() + 10_000;
-  const time_3 = Date.now() + 10_000;
-  const time_4 = Date.now() + 10_000;
-  const time_5 = Date.now() + 10_000;
+  const time_2 = Date.now() + 12_000;
+  const time_3 = Date.now() + 14_000;
+  const time_4 = Date.now() + 16_000;
+  const time_5 = Date.now() + 18_000;
 
   describe("Test Add Item", () => {
     it("should return error if some fields are missing", async () => {
@@ -109,7 +109,7 @@ describe("Items And Quanity Test", () => {
 
       expect(response.body.errors).toBeDefined();
       expect(response.status).toEqual(400);
-      expect(response.body.errors).toBe("Items has expired or low in quantity");
+      expect(response.body.errors).toBe("low in quantity");
     });
   });
 
@@ -117,7 +117,7 @@ describe("Items And Quanity Test", () => {
     it("should return total number of quantity available ", async () => {
       const url = "/foo/quantity";
 
-      const times = [time_4, Date.now() + time_5];
+      const times = [time_4, time_5];
 
       times.forEach(async (time) => {
         await new ItemService(AppDataSource).addItemService({
@@ -126,6 +126,7 @@ describe("Items And Quanity Test", () => {
           expiry: time,
         });
       });
+
       const response_1 = await request.get(url).send();
 
       expect(response_1.body.quantity).toBeDefined();
@@ -147,9 +148,39 @@ describe("Items And Quanity Test", () => {
       expect(response_2.body.validTill).toBeDefined();
       expect(response_2.body).toMatchObject({
         quantity: 25,
-        validTill: time_3,
+        validTill: time_1,
       });
       expect(response_2.status).toEqual(200);
+
+      await new ItemService(AppDataSource).sellItemService({
+        item: "foo",
+        quantity: 20,
+      });
+
+      const response_3 = await request.get(url).send();
+
+      expect(response_3.body.quantity).toBeDefined();
+      expect(response_3.body.validTill).toBeDefined();
+      expect(response_3.body).toMatchObject({
+        quantity: 5,
+        validTill: time_1,
+      });
+      expect(response_3.status).toEqual(200);
+
+      await new ItemService(AppDataSource).sellItemService({
+        item: "foo",
+        quantity: 5,
+      });
+
+      const response_4 = await request.get(url).send();
+
+      expect(response_4.body.quantity).toBeDefined();
+      expect(response_4.body.validTill).toBeDefined();
+      expect(response_4.body).toMatchObject({
+        quantity: 0,
+        validTill: null,
+      });
+      expect(response_4.status).toEqual(200);
     });
   });
 });

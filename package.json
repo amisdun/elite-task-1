@@ -45,12 +45,12 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "npm run watch && nodemon build/index.js",
-    "start:dev": "NODE_ENV=dev && concurrently \"tsc -w\" \"nodemon build/index.js\"",
-    "build": "tsc",
+    "start:dev": "npm run build && NODE_ENV=dev && concurrently \"tsc -w\" \"nodemon build/index.js\"",
+    "build": "rm -rf build/ && tsc",
     "start": "ts-node src/index.ts -w",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration": " npm run typeorm migration:run -- -d ./src/data-source.ts",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "NODE_ENV=test && node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
+    "test": "npm run build && NODE_ENV=test && node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
   }
 }

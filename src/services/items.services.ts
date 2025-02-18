@@ -65,23 +65,39 @@ export class ItemService {
             where: { name: item.toLowerCase() },
           });
 
-          const data = await entityManager
-            .getRepository(Quantity)
-            .createQueryBuilder()
-            .where({
-              item: itemData,
-              expiry: Raw((x) => `${x} > ${dateNow}`),
-              quantity: Raw((y) => `${y} >= ${quantity}`),
-            })
-            .setLock("pessimistic_read")
-            .setOnLocked("skip_locked")
-            .orderBy("id", "ASC")
-            .getOne();
+          const totalQuantity = await this.getTotalNonExpiredQuantity(
+            itemData,
+            dateNow,
+          );
+          if (totalQuantity < quantity) throw Error("low in quantity");
 
-          if (!data) throw Error("Items has expired or low in quantity");
+          let quantityLeft = quantity;
 
-          data.quantity -= quantity;
-          await entityManager.save(data);
+          while (quantityLeft && quantityLeft > 0) {
+            const data = await entityManager
+              .getRepository(Quantity)
+              .createQueryBuilder()
+              .where({
+                item: itemData,
+                quantity: Raw((y) => `${y} > 0`),
+                expiry: Raw((x) => `${x} > ${dateNow}`),
+              })
+              .setLock("pessimistic_write")
+              .setOnLocked("skip_locked")
+              .orderBy("id", "ASC")
+              .getOne();
+
+            const temp = data.quantity;
+
+            if (quantityLeft >= temp) {
+              data.quantity = 0;
+            } else {
+              data.quantity = data.quantity - quantityLeft;
+            }
+
+            await entityManager.save(data);
+            quantityLeft = quantityLeft - temp;
+          }
 
           return {};
         },
@@ -89,6 +105,15 @@ export class ItemService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async getTotalNonExpiredQuantity(itemData: Item, currentExpiry: number) {
+    const totalQuantity = await this.quantityRepository.sum("quantity", {
+      item: { id: itemData.id },
+      expiry: Raw((x) => `${x} > ${currentExpiry}`),
+    });
+
+    return totalQuantity;
   }
 
   async getItemService(item: string) {
@@ -99,10 +124,10 @@ export class ItemService {
         where: { name: item.toLowerCase() },
       });
 
-      const totalQuantity = await this.quantityRepository.sum("quantity", {
-        item: { id: itemData.id },
-        expiry: Raw((x) => `${x} > ${dateNow}`),
-      });
+      const totalQuantity = await this.getTotalNonExpiredQuantity(
+        itemData,
+        dateNow,
+      );
 
       if (!totalQuantity)
         return { quantity: totalQuantity || 0, validTill: null };
