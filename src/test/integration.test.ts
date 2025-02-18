@@ -110,7 +110,9 @@ describe("Items And Quanity Test", () => {
 
       expect(response.body.errors).toBeDefined();
       expect(response.status).toEqual(400);
-      expect(response.body.errors).toBe("low in quantity");
+      expect(response.body.errors).toBe(
+        "cannot complete this request, items are low in quantity or has expired",
+      );
     });
   });
 

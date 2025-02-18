@@ -67,12 +67,6 @@ export class ItemService {
 
           if (!itemData) throw Error("Item not found");
 
-          const totalQuantity = await this.getTotalNonExpiredQuantity(
-            itemData,
-            dateNow,
-          );
-          if (totalQuantity < quantity) throw Error("low in quantity");
-
           let quantityLeft = quantity;
 
           while (quantityLeft && quantityLeft > 0) {
