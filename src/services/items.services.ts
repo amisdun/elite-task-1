@@ -88,8 +88,11 @@ export class ItemService {
               .setOnLocked("skip_locked")
               .orderBy("id", "ASC")
               .getOne();
-            
-            if(!data) throw new Error('cannot complete this request, items are low in quantity or has expired')
+
+            if (!data)
+              throw new Error(
+                "cannot complete this request, items are low in quantity or has expired",
+              );
 
             const temp = data.quantity;
 
