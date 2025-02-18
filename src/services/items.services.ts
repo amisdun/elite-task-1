@@ -88,6 +88,8 @@ export class ItemService {
               .setOnLocked("skip_locked")
               .orderBy("id", "ASC")
               .getOne();
+            
+            if(!data) throw new Error('cannot complete this request, items are low in quantity')
 
             const temp = data.quantity;
 
