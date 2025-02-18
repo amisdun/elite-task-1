@@ -13,9 +13,11 @@ export class ItemController {
         quantity,
         expiry,
       });
-      return res.status(201).json(response);
+      res.status(201).json(response);
+      return;
     } catch (error) {
-      return res.status(400).json({ errors: error.message });
+      res.status(400).json({ errors: error.message });
+      return;
     }
   }
 
@@ -28,9 +30,11 @@ export class ItemController {
         item,
         quantity,
       });
-      return res.status(200).json(response);
+      res.status(200).json(response);
+      return;
     } catch (error) {
-      return res.status(400).json({ errors: error.message });
+      res.status(400).json({ errors: error.message });
+      return;
     }
   }
 
@@ -39,9 +43,11 @@ export class ItemController {
       const ItemServiceInstance = new ItemService(AppDataSource);
       const { item } = req.params;
       const response = await ItemServiceInstance.getItemService(item);
-      return res.status(200).json(response);
+      res.status(200).json(response);
+      return;
     } catch (error) {
-      return res.status(400).json({ errors: error.message });
+      res.status(400).json({ errors: error.message });
+      return;
     }
   }
 }

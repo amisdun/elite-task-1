@@ -11,8 +11,12 @@
     "@babel/preset-typescript": "^7.26.0",
     "@electric-sql/pglite": "^0.2.17",
     "@jest/globals": "^29.7.0",
+    "@types/emscripten": "^1.40.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
+    "@types/node-cron": "^3.0.11",
+    "@types/supertest": "^6.0.2",
+    "@types/web": "^0.0.203",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "jest-mock-extended": "^4.0.0-beta1",
@@ -24,13 +28,9 @@
     "ts-node": "10.9.1",
     "typeorm-pglite": "^0.3.2",
     "typescript": "^5.7.3",
-    "@types/supertest": "^6.0.2",
-    "@types/emscripten": "^1.40.0",
-    "@types/web": "^0.0.203"
+    "@types/express": "^5.0.0"
   },
   "dependencies": {
-    "@": "types/express",
-    "@types/node-cron": "^3.0.11",
     "body-parser": "^1.20.3",
     "concurrently": "^9.1.2",
     "dotenv": "^16.4.7",

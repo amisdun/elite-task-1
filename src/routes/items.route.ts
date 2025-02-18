@@ -1,16 +1,22 @@
-import * as express from "express";
 import { ItemController } from "../controllers/item.controller";
 import { body, param, validationResult } from "express-validator";
-const Router = express.Router();
+import {
+  NextFunction,
+  Request,
+  Response,
+  Router as ExpressRouter,
+} from "express";
+const Router = ExpressRouter();
 
 const checkValidationErrors = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    return res.status(422).json(result);
+    res.status(422).json(result);
+    return;
   }
   next();
 };
