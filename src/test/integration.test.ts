@@ -7,6 +7,7 @@ describe("Items And Quanity Test", () => {
   // Create a mock express request/response
   let request: TestAgent;
   beforeAll(async () => {
+    // initiate in memory database for tests
     await AppDataSource.initialize();
     request = supertest(server);
   });

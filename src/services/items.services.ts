@@ -61,12 +61,11 @@ export class ItemService {
       const dateNow = Date.now();
       return await this.dataSource.transaction(
         async (entityManager: EntityManager) => {
-
           const itemData = await entityManager.findOne(Item, {
             where: { name: item.toLowerCase() },
           });
 
-          if(!itemData) throw Error('Item not found')
+          if (!itemData) throw Error("Item not found");
 
           const totalQuantity = await this.getTotalNonExpiredQuantity(
             itemData,
@@ -127,7 +126,7 @@ export class ItemService {
         where: { name: item.toLowerCase() },
       });
 
-      if(!itemData) throw Error('Item not found')
+      if (!itemData) throw Error("Item not found");
 
       const totalQuantity = await this.getTotalNonExpiredQuantity(
         itemData,

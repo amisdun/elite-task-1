@@ -35,8 +35,8 @@ if (cluster.isPrimary) {
   app.use(bodyParser.urlencoded({ extended: true }));
   const { PORT = 3000 } = process.env;
   app.use("", itemsRouter);
-  app.get("*", (req: Request, res: Response) => {
-    res.status(505).json({ message: "Bad Request" });
+  app.get("/", (req: Request, res: Response) => {
+    res.status(200).json({ message: "Health check" });
   });
 
   AppDataSource.initialize()
@@ -45,7 +45,6 @@ if (cluster.isPrimary) {
         console.log(
           `Worker process ${process.pid} is listening on port ${PORT}`,
         );
-        console.log("Server is running on http://localhost:" + PORT);
       });
       console.log("Data Source has been initialized!");
       cron.schedule(
