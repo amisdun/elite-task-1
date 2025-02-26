@@ -113,7 +113,6 @@ export class ItemService {
   async getTotalNonExpiredQuantity(itemData: Item, currentExpiry: number) {
     const totalQuantity = await this.quantityRepository.sum("quantity", {
       item: { id: itemData.id },
-      quantity: Raw((y) => `${y} > 0`),
       expiry: Raw((x) => `${x} > ${currentExpiry}`),
     });
 

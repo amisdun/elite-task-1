@@ -47,12 +47,13 @@ if (cluster.isPrimary) {
         );
       });
       console.log("Data Source has been initialized!");
-      cron.schedule(
-        "0 */2 * * * ",
-        new ItemService(AppDataSource).periodicallyClearExpiredRecords,
-      );
     })
     .catch((error) => console.log(error));
 }
+
+cron.schedule(
+  "0 */2 * * * ",
+  new ItemService(AppDataSource).periodicallyClearExpiredRecords,
+);
 
 export { app };
