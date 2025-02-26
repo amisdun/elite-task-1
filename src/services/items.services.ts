@@ -28,6 +28,8 @@ export class ItemService {
           "quantity has already expired, please specify a valid expiry",
         );
 
+      if(quantity <= 0) throw new Error('quantity cannot be zero or less than zero')
+
       let itemData: Item = await this.itemRepository.findOne({
         where: { name: item.toLowerCase() },
       });
@@ -111,6 +113,7 @@ export class ItemService {
   async getTotalNonExpiredQuantity(itemData: Item, currentExpiry: number) {
     const totalQuantity = await this.quantityRepository.sum("quantity", {
       item: { id: itemData.id },
+      quantity: Raw((y) => `${y} > 0`),
       expiry: Raw((x) => `${x} > ${currentExpiry}`),
     });
 
