@@ -157,7 +157,7 @@ export class ItemService {
     try {
       const dateNow = Date.now();
       const records = await this.quantityRepository.delete({
-        expiry: Raw((x) => `${x} > ${dateNow}`),
+        expiry: Raw((x) => `${x} < ${dateNow}`),
       });
 
       console.log(
